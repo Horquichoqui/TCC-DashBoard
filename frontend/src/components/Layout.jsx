@@ -38,6 +38,9 @@ export default function Layout({ children }) {
           <Link to="/relatorios" className={`menu-item ${isActive('/relatorios')}`}>
             📊 Relatórios
           </Link>
+
+          <div className="menu-divisor"></div>
+
           {usuario?.funcao === 'admin' && (
             <>
               <Link to="/disciplinas" className={`menu-item ${isActive('/disciplinas')}`}>
@@ -48,6 +51,12 @@ export default function Layout({ children }) {
               </Link>
             </>
           )}
+
+          <div className="menu-divisor"></div>
+
+          <Link to="/ajuda" className={`menu-item ${isActive('/ajuda')}`}>
+            ❓ Ajuda & Tutorial
+          </Link>
         </nav>
 
         <div className="user-info">
