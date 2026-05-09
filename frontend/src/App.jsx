@@ -5,6 +5,8 @@ import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AlunosPage from './pages/AlunosPage';
+import FaltasPage from './pages/FaltasPage';
+import AlunosEmRiscoPage from './pages/AlunosEmRiscoPage';
 import './App.css';
 
 function PrivateRoute({ children }) {
@@ -40,6 +42,22 @@ function AppContent() {
               element={
                 <Layout>
                   <AlunosPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/faltas"
+              element={
+                <Layout>
+                  <FaltasPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/alunos-risco"
+              element={
+                <Layout>
+                  <AlunosEmRiscoPage />
                 </Layout>
               }
             />

@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
             AlunoSeeder::class,
             DisciplinaSeeder::class,
             NotaSeeder::class,
+            DiaLetivoSeeder::class,
+            FaltaSeeder::class,
         ]);
     }
 }

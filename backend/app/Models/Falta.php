@@ -11,7 +11,7 @@ class Falta extends Model
 
     protected $table = 'faltas';
 
-    protected $fillable = ['aluno_id', 'data', 'presente'];
+    protected $fillable = ['aluno_id', 'data', 'presente', 'bimestre'];
 
     protected $casts = [
         'data' => 'date',
