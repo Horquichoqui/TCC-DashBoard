@@ -7,6 +7,7 @@ import DashboardPage from './pages/DashboardPage';
 import AlunosPage from './pages/AlunosPage';
 import FaltasPage from './pages/FaltasPage';
 import AlunosEmRiscoPage from './pages/AlunosEmRiscoPage';
+import RelatoriosPage from './pages/RelatoriosPage';
 import './App.css';
 
 function PrivateRoute({ children }) {
@@ -58,6 +59,14 @@ function AppContent() {
               element={
                 <Layout>
                   <AlunosEmRiscoPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/relatorios"
+              element={
+                <Layout>
+                  <RelatoriosPage />
                 </Layout>
               }
             />

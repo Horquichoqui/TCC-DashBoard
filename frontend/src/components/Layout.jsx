@@ -35,6 +35,9 @@ export default function Layout({ children }) {
           <Link to="/alunos-risco" className={`menu-item ${isActive('/alunos-risco')}`}>
             ⚠️ Alunos em Risco
           </Link>
+          <Link to="/relatorios" className={`menu-item ${isActive('/relatorios')}`}>
+            📊 Relatórios
+          </Link>
           {usuario?.funcao === 'admin' && (
             <>
               <Link to="/disciplinas" className={`menu-item ${isActive('/disciplinas')}`}>
