@@ -31,7 +31,7 @@ return new class extends Migration
             usuario_id BIGINT,
             ip_address VARCHAR(45),
             user_agent TEXT,
-            payload LONGTEXT NOT NULL,
+            payload TEXT NOT NULL,
             last_activity INTEGER NOT NULL,
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
         )');
