@@ -8,14 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('disciplinas')) {
-            Schema::create('disciplinas', function (Blueprint $table) {
-                $table->id();
-                $table->string('nome');
-                $table->text('descricao')->nullable();
-                $table->timestamps();
-            });
-        }
+        $pdo = Schema::getConnection()->getPdo();
+
+        $pdo->exec('CREATE TABLE IF NOT EXISTS disciplinas (
+            id BIGSERIAL PRIMARY KEY,
+            nome VARCHAR(255) NOT NULL,
+            descricao TEXT,
+            created_at TIMESTAMP,
+            updated_at TIMESTAMP
+        )');
     }
 
     public function down(): void

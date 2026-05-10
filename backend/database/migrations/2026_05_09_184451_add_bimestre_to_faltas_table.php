@@ -8,19 +8,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('faltas') && !Schema::hasColumn('faltas', 'bimestre')) {
-            Schema::table('faltas', function (Blueprint $table) {
-                $table->integer('bimestre')->default(1)->after('presente');
-            });
-        }
+        $pdo = Schema::getConnection()->getPdo();
+        $pdo->exec('ALTER TABLE faltas ADD COLUMN IF NOT EXISTS bimestre INTEGER NOT NULL DEFAULT 1');
     }
 
     public function down(): void
     {
-        if (Schema::hasColumn('faltas', 'bimestre')) {
-            Schema::table('faltas', function (Blueprint $table) {
-                $table->dropColumn('bimestre');
-            });
-        }
+        $pdo = Schema::getConnection()->getPdo();
+        $pdo->exec('ALTER TABLE faltas DROP COLUMN IF EXISTS bimestre');
     }
 };

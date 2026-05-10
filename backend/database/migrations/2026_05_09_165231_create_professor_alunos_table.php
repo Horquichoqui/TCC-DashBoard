@@ -8,15 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('professor_alunos')) {
-            Schema::create('professor_alunos', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('professor_id')->references('id')->on('usuarios')->onDelete('cascade');
-                $table->foreignId('aluno_id')->references('id')->on('alunos')->onDelete('cascade');
-                $table->timestamps();
-                $table->unique(['professor_id', 'aluno_id']);
-            });
-        }
+        $pdo = Schema::getConnection()->getPdo();
+
+        $pdo->exec('CREATE TABLE IF NOT EXISTS professor_alunos (
+            id BIGSERIAL PRIMARY KEY,
+            professor_id BIGINT NOT NULL,
+            aluno_id BIGINT NOT NULL,
+            created_at TIMESTAMP,
+            updated_at TIMESTAMP,
+            UNIQUE(professor_id, aluno_id),
+            FOREIGN KEY (professor_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+            FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE
+        )');
     }
 
     public function down(): void

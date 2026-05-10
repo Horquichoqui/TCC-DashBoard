@@ -8,16 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('notas')) {
-            Schema::create('notas', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('aluno_id')->references('id')->on('alunos')->onDelete('cascade');
-                $table->foreignId('disciplina_id')->references('id')->on('disciplinas')->onDelete('cascade');
-                $table->decimal('valor_nota', 5, 2);
-                $table->integer('semestre')->default(1);
-                $table->timestamps();
-            });
-        }
+        $pdo = Schema::getConnection()->getPdo();
+
+        $pdo->exec('CREATE TABLE IF NOT EXISTS notas (
+            id BIGSERIAL PRIMARY KEY,
+            aluno_id BIGINT NOT NULL,
+            disciplina_id BIGINT NOT NULL,
+            valor_nota NUMERIC(5, 2) NOT NULL,
+            semestre INTEGER NOT NULL DEFAULT 1,
+            created_at TIMESTAMP,
+            updated_at TIMESTAMP,
+            FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
+            FOREIGN KEY (disciplina_id) REFERENCES disciplinas(id) ON DELETE CASCADE
+        )');
     }
 
     public function down(): void
