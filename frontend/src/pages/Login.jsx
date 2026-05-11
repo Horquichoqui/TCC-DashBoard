@@ -42,39 +42,52 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-blue-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
-
         {/* Cabeçalho da tela de login */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">📊</div>
-          <h1 className="text-2xl font-bold text-gray-800">Dashboard Pedagógico</h1>
-          <p className="text-gray-500 text-sm mt-1">Escola Cooperativa Coopen</p>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Dashboard Pedagógico
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Escola Cooperativa Coopen
+          </p>
         </div>
 
         {/* Formulário de login */}
         <form onSubmit={aoEnviar} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              E-mail
+            </label>
             <input
               type="email"
               value={formulario.email}
-              onChange={(e) => setFormulario({ ...formulario, email: e.target.value })}
+              onChange={(e) =>
+                setFormulario({ ...formulario, email: e.target.value })
+              }
               className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Senha
+            </label>
             <input
               type="password"
               value={formulario.senha}
-              onChange={(e) => setFormulario({ ...formulario, senha: e.target.value })}
+              onChange={(e) =>
+                setFormulario({ ...formulario, senha: e.target.value })
+              }
               className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             />
           </div>
 
           {mensagemErro && (
-            <p className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">{mensagemErro}</p>
+            <p className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+              {mensagemErro}
+            </p>
           )}
 
           <button
@@ -87,7 +100,7 @@ export default function Login() {
         </form>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          TCC/Projeto Integrador — UNIVESP
+          TCC/Projeto Integrador - UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO
         </p>
       </div>
     </div>

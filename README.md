@@ -49,7 +49,7 @@ Abra `backend/.env` e preencha:
 
 ```
 DATABASE_URL="postgresql://usuario:senha@host/neondb?sslmode=require&channel_binding=require"
-JWT_SECRET="uma_chave_secreta_forte"
+JWT_SECRET="uma_chave"
 PORT=3000
 NODE_ENV=development
 USE_MOCK_DATA=false
@@ -94,7 +94,7 @@ O sistema usa PostgreSQL hospedado no [Neon](https://neon.tech).
 
 | Tabela | Descrição |
 |--------|-----------|
-| `usuarios` | Usuários do sistema (coordenação) |
+| `usuarios` | Usuários do sistema (coordenação para conferência) |
 | `turmas` | Turmas e anos letivos |
 | `alunos` | Alunos matriculados |
 | `disciplinas` | Disciplinas |
@@ -278,11 +278,6 @@ Qualquer rota não-API é redirecionada para `index.html` (SPA).
 - [ ] Recarregar `/dashboard` não gera 404 em produção
 
 ---
-
-## Branch limpa
-
-Esta versão foi criada do zero em uma branch nova (`claude/tcc-web-system-0oZNF`),
-sem reaproveitar arquivos antigos do repositório.
 
 ---
 
