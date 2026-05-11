@@ -1,15 +1,30 @@
+// ============================================================
+// ROTA DE SAÚDE — healthRoutes.js
+// ============================================================
+// GET /api/health → verifica se o servidor e o banco estão funcionando.
+// Útil para confirmar que o deploy no Render está ok.
+// ============================================================
+
 import { Router } from "express";
 import { pool } from "../db.js";
 
-const router = Router();
+const roteador = Router();
 
-router.get("/", async (req, res) => {
+roteador.get("/", async (req, res) => {
   try {
-    await pool.query("SELECT 1");
-    return res.json({ status: "ok", database: "connected", message: "Backend conectado ao Neon" });
-  } catch (err) {
-    return res.status(500).json({ status: "error", database: "disconnected", message: err.message });
+    await pool.query("SELECT 1"); // Consulta simples para testar a conexão
+    return res.json({
+      status: "ok",
+      banco: "conectado",
+      mensagem: "Backend conectado ao Neon com sucesso",
+    });
+  } catch (erro) {
+    return res.status(500).json({
+      status: "erro",
+      banco: "desconectado",
+      mensagem: erro.message,
+    });
   }
 });
 
-export default router;
+export default roteador;

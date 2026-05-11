@@ -1,11 +1,19 @@
+// ============================================================
+// CARD DE INDICADOR — StatCard.jsx
+// ============================================================
+// Exibe um número de destaque com título e ícone colorido.
+// Usado nos cards do dashboard: total de alunos, média geral, etc.
+// ============================================================
+
 import React from "react";
 
 export default function StatCard({ titulo, valor, icone, cor = "blue" }) {
+  // Paleta de cores para o fundo do ícone
   const cores = {
-    blue: "bg-blue-50 text-blue-700",
-    green: "bg-green-50 text-green-700",
+    blue:   "bg-blue-50 text-blue-700",
+    green:  "bg-green-50 text-green-700",
     yellow: "bg-yellow-50 text-yellow-700",
-    red: "bg-red-50 text-red-700",
+    red:    "bg-red-50 text-red-700",
   };
 
   return (

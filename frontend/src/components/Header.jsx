@@ -1,6 +1,14 @@
+// ============================================================
+// CABEÇALHO DAS TELAS — Header.jsx
+// ============================================================
+// Barra superior exibida em todas as telas do sistema.
+// Mostra o título da página e o nome do usuário logado.
+// ============================================================
+
 import React from "react";
 
 export default function Header({ titulo }) {
+  // Lê os dados do usuário salvo no localStorage após o login
   const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
   return (

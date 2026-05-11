@@ -1,5 +1,10 @@
-// Tela de alunos em risco: lista alunos com situação Risco ou Atenção
-// Permite filtros por turma e situação, e exportação CSV
+// ============================================================
+// TELA DE ALUNOS EM RISCO — AlunosRisco.jsx
+// ============================================================
+// Lista os alunos em situação de Risco ou Atenção.
+// Permite filtrar por turma e situação, e exportar o resultado em CSV.
+// ============================================================
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
@@ -11,47 +16,54 @@ import EmptyState from "../components/EmptyState.jsx";
 import api from "../services/api.js";
 
 export default function AlunosRisco() {
-  const navigate = useNavigate();
-  const [alunos, setAlunos] = useState([]);
-  const [turmas, setTurmas] = useState([]);
-  const [filtros, setFiltros] = useState({ turma_id: "", situacao: "" });
-  const [loading, setLoading] = useState(true);
+  const navegar = useNavigate();
+  const [alunos,     setAlunos]     = useState([]);
+  const [turmas,     setTurmas]     = useState([]);
+  const [filtros,    setFiltros]    = useState({ turma_id: "", situacao: "" });
+  const [carregando, setCarregando] = useState(true);
 
+  // Carrega turmas para popular o filtro
   useEffect(() => {
     api.get("/turmas").then((r) => setTurmas(r.data)).catch(() => {});
   }, []);
 
+  // Recarrega a lista sempre que o filtro mudar
   useEffect(() => {
     carregarAlunos();
   }, [filtros]);
 
   async function carregarAlunos() {
-    setLoading(true);
+    setCarregando(true);
     try {
-      const params = {};
-      if (filtros.turma_id) params.turma_id = filtros.turma_id;
-      const { data } = await api.get("/alunos/risco", { params });
+      const parametros = {};
+      if (filtros.turma_id) parametros.turma_id = filtros.turma_id;
+
+      const { data } = await api.get("/alunos/risco", { params: parametros });
+
+      // Aplica o filtro de situação no frontend (Risco ou Atenção)
       setAlunos(filtros.situacao ? data.filter((a) => a.situacao === filtros.situacao) : data);
-    } catch (err) {
-      console.error(err);
+    } catch (erro) {
+      console.error(erro);
     } finally {
-      setLoading(false);
+      setCarregando(false);
     }
   }
 
+  // Faz o download do CSV de alunos em risco
   function exportarCSV() {
-    const params = new URLSearchParams();
-    if (filtros.turma_id) params.set("turma_id", filtros.turma_id);
+    const parametros = new URLSearchParams();
+    if (filtros.turma_id) parametros.set("turma_id", filtros.turma_id);
     const token = localStorage.getItem("token");
-    const url = `${import.meta.env.VITE_API_URL || "/api"}/relatorios/alunos-risco/exportar?${params}`;
-    // Cria link temporário para download com autenticação via fetch
-    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+    const urlExportacao = `${import.meta.env.VITE_API_URL || "/api"}/relatorios/alunos-risco/exportar?${parametros}`;
+
+    // Usa fetch para enviar o token e receber o arquivo
+    fetch(urlExportacao, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.blob())
-      .then((blob) => {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "alunos_em_risco.csv";
-        a.click();
+      .then((arquivo) => {
+        const linkTemporario = document.createElement("a");
+        linkTemporario.href = URL.createObjectURL(arquivo);
+        linkTemporario.download = "alunos_em_risco.csv";
+        linkTemporario.click();
       });
   }
 
@@ -77,7 +89,7 @@ export default function AlunosRisco() {
               <p className="text-sm text-gray-500">{alunos.length} alunos encontrados</p>
             </div>
 
-            {loading ? (
+            {carregando ? (
               <Loading />
             ) : alunos.length === 0 ? (
               <EmptyState mensagem="Nenhum aluno em risco encontrado com os filtros selecionados." />
@@ -97,18 +109,18 @@ export default function AlunosRisco() {
                     </tr>
                   </thead>
                   <tbody>
-                    {alunos.map((a) => (
-                      <tr key={a.id} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="px-4 py-3 font-medium text-gray-800">{a.nome}</td>
-                        <td className="px-4 py-3 text-gray-500">{a.matricula}</td>
-                        <td className="px-4 py-3 text-gray-600">{a.turma}</td>
-                        <td className="px-4 py-3 font-semibold">{Number(a.media_geral).toFixed(1)}</td>
-                        <td className="px-4 py-3">{Number(a.frequencia_media).toFixed(1)}%</td>
-                        <td className="px-4 py-3"><RiskBadge situacao={a.situacao} /></td>
-                        <td className="px-4 py-3 text-gray-500 text-xs">{a.motivo}</td>
+                    {alunos.map((aluno) => (
+                      <tr key={aluno.id} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="px-4 py-3 font-medium text-gray-800">{aluno.nome}</td>
+                        <td className="px-4 py-3 text-gray-500">{aluno.matricula}</td>
+                        <td className="px-4 py-3 text-gray-600">{aluno.turma}</td>
+                        <td className="px-4 py-3 font-semibold">{Number(aluno.media_geral).toFixed(1)}</td>
+                        <td className="px-4 py-3">{Number(aluno.frequencia_media).toFixed(1)}%</td>
+                        <td className="px-4 py-3"><RiskBadge situacao={aluno.situacao} /></td>
+                        <td className="px-4 py-3 text-gray-500 text-xs">{aluno.motivo}</td>
                         <td className="px-4 py-3">
                           <button
-                            onClick={() => navigate(`/alunos/${a.id}`)}
+                            onClick={() => navegar(`/alunos/${aluno.id}`)}
                             className="text-blue-600 hover:underline text-xs font-medium"
                           >
                             Ver detalhes

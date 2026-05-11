@@ -1,3 +1,9 @@
+// ============================================================
+// INDICADOR DE CARREGAMENTO — Loading.jsx
+// ============================================================
+// Exibido enquanto os dados estão sendo carregados do backend.
+// ============================================================
+
 import React from "react";
 
 export default function Loading({ mensagem = "Carregando..." }) {

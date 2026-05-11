@@ -1,33 +1,47 @@
-// Repository do dashboard: queries que alimentam os indicadores e gráficos
+// ============================================================
+// REPOSITÓRIO DO DASHBOARD — dashboardRepository.js
+// ============================================================
+// Consultas SQL que alimentam os cards de indicadores e gráficos
+// da tela principal do sistema.
+// ============================================================
+
 import { pool } from "../db.js";
 
+// Retorna os totais e médias para os cards do dashboard
 export async function buscarResumo(filtros = {}) {
   const { ano_letivo, turma_id } = filtros;
 
-  let whereAluno = "WHERE a.ativo = TRUE";
-  const params = [];
+  let condicaoSQL = "WHERE a.ativo = TRUE";
+  const parametros = [];
 
   if (turma_id) {
-    params.push(turma_id);
-    whereAluno += ` AND a.turma_id = $${params.length}`;
+    parametros.push(turma_id);
+    condicaoSQL += ` AND a.turma_id = $${parametros.length}`;
   }
 
-  const totalAlunos = await pool.query(`SELECT COUNT(*) AS total FROM alunos a ${whereAluno}`, params);
+  // Total de alunos ativos
+  const totalAlunos = await pool.query(
+    `SELECT COUNT(*) AS total FROM alunos a ${condicaoSQL}`,
+    parametros
+  );
 
+  // Média geral de todas as notas
   const mediaGeral = await pool.query(`
     SELECT ROUND(AVG(n.nota)::numeric, 2) AS media
     FROM notas n
     JOIN alunos a ON a.id = n.aluno_id
-    ${whereAluno}
-  `, params);
+    ${condicaoSQL}
+  `, parametros);
 
-  const freqMedia = await pool.query(`
+  // Frequência média de todos os alunos
+  const frequenciaMedia = await pool.query(`
     SELECT ROUND(AVG(f.percentual_frequencia)::numeric, 2) AS frequencia
     FROM frequencias f
     JOIN alunos a ON a.id = f.aluno_id
-    ${whereAluno}
-  `, params);
+    ${condicaoSQL}
+  `, parametros);
 
+  // Total de turmas com alunos ativos
   const totalTurmas = await pool.query(`
     SELECT COUNT(DISTINCT t.id) AS total
     FROM turmas t
@@ -39,13 +53,14 @@ export async function buscarResumo(filtros = {}) {
   return {
     total_alunos: parseInt(totalAlunos.rows[0].total),
     media_geral: parseFloat(mediaGeral.rows[0].media) || 0,
-    frequencia_media: parseFloat(freqMedia.rows[0].frequencia) || 0,
+    frequencia_media: parseFloat(frequenciaMedia.rows[0].frequencia) || 0,
     total_turmas: parseInt(totalTurmas.rows[0].total),
   };
 }
 
+// Dados para o gráfico: alunos em risco agrupados por turma
 export async function buscarRiscoPorTurma() {
-  const result = await pool.query(`
+  const resultado = await pool.query(`
     SELECT
       t.nome AS turma,
       COUNT(a.id) AS total_alunos,
@@ -61,11 +76,12 @@ export async function buscarRiscoPorTurma() {
     GROUP BY t.id, t.nome
     ORDER BY t.nome
   `);
-  return result.rows;
+  return resultado.rows;
 }
 
+// Dados para o gráfico de linha: média por bimestre
 export async function buscarEvolucaoDesempenho() {
-  const result = await pool.query(`
+  const resultado = await pool.query(`
     SELECT
       p.nome AS periodo,
       ROUND(AVG(n.nota)::numeric, 2) AS media
@@ -74,11 +90,12 @@ export async function buscarEvolucaoDesempenho() {
     GROUP BY p.id, p.nome
     ORDER BY p.id
   `);
-  return result.rows;
+  return resultado.rows;
 }
 
+// Dados para o gráfico de barras: frequência média por turma
 export async function buscarFrequenciaPorTurma() {
-  const result = await pool.query(`
+  const resultado = await pool.query(`
     SELECT
       t.nome AS turma,
       ROUND(AVG(f.percentual_frequencia)::numeric, 2) AS frequencia_media
@@ -89,11 +106,12 @@ export async function buscarFrequenciaPorTurma() {
     GROUP BY t.id, t.nome
     ORDER BY t.nome
   `);
-  return result.rows;
+  return resultado.rows;
 }
 
+// Dados para o gráfico de pizza: média e frequência de cada aluno (para calcular situação)
 export async function buscarDistribuicaoSituacao() {
-  const result = await pool.query(`
+  const resultado = await pool.query(`
     SELECT
       a.id,
       AVG(n.nota) AS media,
@@ -104,5 +122,5 @@ export async function buscarDistribuicaoSituacao() {
     WHERE a.ativo = TRUE
     GROUP BY a.id
   `);
-  return result.rows;
+  return resultado.rows;
 }

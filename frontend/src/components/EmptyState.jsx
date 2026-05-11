@@ -1,3 +1,9 @@
+// ============================================================
+// ESTADO VAZIO — EmptyState.jsx
+// ============================================================
+// Exibido quando uma consulta não retorna nenhum resultado.
+// ============================================================
+
 import React from "react";
 
 export default function EmptyState({ mensagem = "Nenhum dado encontrado." }) {

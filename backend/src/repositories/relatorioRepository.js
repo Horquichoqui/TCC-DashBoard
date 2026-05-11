@@ -1,17 +1,23 @@
-// Repository de relatórios: queries para exportação de dados
+// ============================================================
+// REPOSITÓRIO DE RELATÓRIOS — relatorioRepository.js
+// ============================================================
+// Consulta SQL para exportação de dados de alunos em CSV.
+// ============================================================
+
 import { pool } from "../db.js";
 
+// Retorna os dados de todos os alunos necessários para o CSV
 export async function buscarAlunosParaExportacao(filtros = {}) {
   const { turma_id } = filtros;
-  const params = [];
-  let where = "WHERE a.ativo = TRUE";
+  const parametros = [];
+  let condicaoSQL = "WHERE a.ativo = TRUE";
 
   if (turma_id) {
-    params.push(turma_id);
-    where += ` AND a.turma_id = $${params.length}`;
+    parametros.push(turma_id);
+    condicaoSQL += ` AND a.turma_id = $${parametros.length}`;
   }
 
-  const result = await pool.query(`
+  const resultado = await pool.query(`
     SELECT
       a.nome,
       a.matricula,
@@ -22,10 +28,10 @@ export async function buscarAlunosParaExportacao(filtros = {}) {
     LEFT JOIN turmas t ON t.id = a.turma_id
     LEFT JOIN notas n ON n.aluno_id = a.id
     LEFT JOIN frequencias f ON f.aluno_id = a.id
-    ${where}
+    ${condicaoSQL}
     GROUP BY a.id, a.nome, a.matricula, t.nome
     ORDER BY a.nome
-  `, params);
+  `, parametros);
 
-  return result.rows;
+  return resultado.rows;
 }

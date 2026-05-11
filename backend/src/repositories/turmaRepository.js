@@ -1,17 +1,24 @@
-// Repository de turmas: consultas SQL relacionadas à tabela turmas
+// ============================================================
+// REPOSITÓRIO DE TURMAS — turmaRepository.js
+// ============================================================
+// Centraliza as consultas SQL da tabela "turmas".
+// Retorna turmas com indicadores agregados dos alunos.
+// ============================================================
+
 import { pool } from "../db.js";
 
+// Lista todas as turmas com estatísticas: média, frequência e alunos em risco
 export async function listarTurmas(filtros = {}) {
   const { ano_letivo } = filtros;
-  const params = [];
-  let where = "";
+  const parametros = [];
+  let condicaoSQL = "";
 
   if (ano_letivo) {
-    params.push(ano_letivo);
-    where = "WHERE t.ano_letivo = $1";
+    parametros.push(ano_letivo);
+    condicaoSQL = "WHERE t.ano_letivo = $1";
   }
 
-  const result = await pool.query(`
+  const resultado = await pool.query(`
     SELECT
       t.id, t.nome, t.ano_letivo, t.turno,
       COUNT(a.id) AS total_alunos,
@@ -28,14 +35,15 @@ export async function listarTurmas(filtros = {}) {
     LEFT JOIN (
       SELECT aluno_id, AVG(percentual_frequencia) AS freq FROM frequencias GROUP BY aluno_id
     ) frq ON frq.aluno_id = a.id
-    ${where}
+    ${condicaoSQL}
     GROUP BY t.id, t.nome, t.ano_letivo, t.turno
     ORDER BY t.ano_letivo DESC, t.nome
-  `, params);
+  `, parametros);
 
-  return result.rows;
+  return resultado.rows;
 }
 
+// Retorna os dados de uma turma específica com a lista de seus alunos
 export async function buscarTurmaPorId(id) {
   const turma = await pool.query("SELECT * FROM turmas WHERE id = $1", [id]);
   if (!turma.rows[0]) return null;

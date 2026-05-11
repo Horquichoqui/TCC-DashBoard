@@ -1,6 +1,12 @@
-// Servidor Express principal
-// Responsável por: API REST + servir o frontend React em produção
-import "dotenv/config";
+// ============================================================
+// SERVIDOR PRINCIPAL — server.js
+// ============================================================
+// Este arquivo é o ponto de entrada do sistema.
+// Ele configura o Express, registra todas as rotas da API
+// e, em produção, também entrega as telas do React para o navegador.
+// ============================================================
+
+import "dotenv/config"; // Carrega as variáveis do arquivo .env
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -8,75 +14,87 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import { testConnection } from "./db.js";
-import { errorMiddleware } from "./middlewares/errorMiddleware.js";
+import { tratarErro } from "./middlewares/errorMiddleware.js";
 
-import authRoutes from "./routes/authRoutes.js";
-import dashboardRoutes from "./routes/dashboardRoutes.js";
-import alunoRoutes from "./routes/alunoRoutes.js";
-import turmaRoutes from "./routes/turmaRoutes.js";
-import relatorioRoutes from "./routes/relatorioRoutes.js";
-import healthRoutes from "./routes/healthRoutes.js";
-import databaseRoutes from "./routes/databaseRoutes.js";
-import integracaoRoutes from "./routes/integracaoRoutes.js";
+import rotasAutenticacao from "./routes/authRoutes.js";
+import rotasDashboard from "./routes/dashboardRoutes.js";
+import rotasAlunos from "./routes/alunoRoutes.js";
+import rotasTurmas from "./routes/turmaRoutes.js";
+import rotasRelatorios from "./routes/relatorioRoutes.js";
+import rotasHealth from "./routes/healthRoutes.js";
+import rotasBancoDados from "./routes/databaseRoutes.js";
+import rotasIntegracao from "./routes/integracaoRoutes.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORTA = process.env.PORT || 3000;
 
+// Necessário para descobrir o caminho da pasta atual (módulos ES)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Origens permitidas no CORS (desenvolvimento local)
-const allowedOrigins = [
+// Origens de frontend permitidas (somente para desenvolvimento local)
+const origensPermitidas = [
   "http://localhost:5173",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
-// Segurança HTTP básica com Helmet
+// Helmet: adiciona cabeçalhos HTTP de segurança automaticamente
 app.use(helmet({ contentSecurityPolicy: false }));
 
-// CORS: em produção usa mesma origem, em dev libera localhost:5173
+// CORS: em produção, frontend e backend estão na mesma URL (sem problema)
+// Em desenvolvimento local, libera o endereço do Vite (porta 5173)
 app.use(cors({
-  origin: process.env.NODE_ENV === "production" ? true : allowedOrigins,
+  origin: process.env.NODE_ENV === "production" ? true : origensPermitidas,
   credentials: true,
 }));
 
+// Permite que o servidor leia o corpo das requisições no formato JSON
 app.use(express.json());
 
-// --- Rotas da API ---
-// As rotas /api devem ser registradas ANTES do frontend estático
-app.use("/api/auth", authRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/alunos", alunoRoutes);
-app.use("/api/turmas", turmaRoutes);
-app.use("/api/relatorios", relatorioRoutes);
-app.use("/api/health", healthRoutes);
-app.use("/api/database", databaseRoutes);
-app.use("/api/integracao-sponte", integracaoRoutes);
+// ============================================================
+// ROTAS DA API
+// Todas começam com /api para separar do frontend
+// IMPORTANTE: devem ser registradas ANTES do frontend estático
+// ============================================================
+app.use("/api/auth",             rotasAutenticacao); // Login e dados do usuário
+app.use("/api/dashboard",        rotasDashboard);    // Indicadores e gráficos
+app.use("/api/alunos",           rotasAlunos);       // Lista e detalhe de alunos
+app.use("/api/turmas",           rotasTurmas);       // Lista e detalhe de turmas
+app.use("/api/relatorios",       rotasRelatorios);   // Exportação CSV
+app.use("/api/health",           rotasHealth);       // Verificação de saúde do sistema
+app.use("/api/banco-dados",      rotasBancoDados);   // Inspeção do banco (só desenvolvimento)
+app.use("/api/integracao-sponte",rotasIntegracao);   // Status da integração Sponte
 
-// --- Frontend React em produção ---
-// O Render executa apenas o backend. O frontend compilado fica em frontend/dist
-// O Express serve esses arquivos estáticos para qualquer rota que não seja /api
+// ============================================================
+// FRONTEND REACT EM PRODUÇÃO
+// O Render sobe apenas o Node.js. O Express entrega os arquivos
+// do React compilados (pasta frontend/dist) para o navegador.
+// ============================================================
 if (process.env.NODE_ENV === "production") {
-  const frontendDistPath = path.join(__dirname, "../../frontend/dist");
+  const pastaFrontend = path.join(__dirname, "../../frontend/dist");
 
-  app.use(express.static(frontendDistPath));
+  // Serve os arquivos estáticos do React (JS, CSS, imagens)
+  app.use(express.static(pastaFrontend));
 
-  // Redireciona qualquer rota não encontrada para o index.html (SPA)
-  // Evita 404 ao recarregar /dashboard ou /alunos-risco no navegador
+  // Qualquer rota que não seja /api é redirecionada para o index.html
+  // Isso evita erro 404 ao recarregar /dashboard no navegador
   app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(frontendDistPath, "index.html"));
+    res.sendFile(path.join(pastaFrontend, "index.html"));
   });
 }
 
-app.use(errorMiddleware);
+// Middleware global de erros (captura erros não tratados nas rotas)
+app.use(tratarErro);
 
-// Inicia o servidor e testa conexão com o banco Neon
-app.listen(PORT, async () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+// ============================================================
+// INICIALIZAÇÃO DO SERVIDOR
+// ============================================================
+app.listen(PORTA, async () => {
+  console.log(`🚀 Servidor rodando na porta ${PORTA}`);
   console.log(`   Ambiente: ${process.env.NODE_ENV || "development"}`);
   try {
-    await testConnection();
-  } catch (err) {
-    console.error("⚠️  Servidor iniciado mas banco não conectado:", err.message);
+    await testConnection(); // Testa se o banco Neon está acessível
+  } catch (erro) {
+    console.error("⚠️  Servidor iniciado mas banco não conectado:", erro.message);
   }
 });

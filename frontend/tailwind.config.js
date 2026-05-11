@@ -1,11 +1,13 @@
+// Configuração do Tailwind CSS — framework de estilos usado nas telas
+// O campo "content" indica quais arquivos o Tailwind deve escanear para gerar os estilos
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: "#eff6ff",
+        marca: {
+          50:  "#eff6ff",
           100: "#dbeafe",
           500: "#3b82f6",
           600: "#2563eb",
