@@ -8,41 +8,39 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $pdo = Schema::getConnection()->getPdo();
-
-        $pdo->exec('CREATE TABLE IF NOT EXISTS jobs (
+        Schema::statement('CREATE TABLE IF NOT EXISTS jobs (
             id BIGSERIAL PRIMARY KEY,
-            queue VARCHAR(255) NOT NULL,
-            payload TEXT NOT NULL,
-            attempts SMALLINT NOT NULL,
+            queue VARCHAR(255),
+            payload TEXT,
+            attempts SMALLINT,
             reserved_at INTEGER,
-            available_at INTEGER NOT NULL,
-            created_at INTEGER NOT NULL
+            available_at INTEGER,
+            created_at INTEGER
         )');
 
-        $pdo->exec('CREATE INDEX IF NOT EXISTS jobs_queue_index ON jobs(queue)');
+        Schema::statement('CREATE INDEX IF NOT EXISTS jobs_queue_index ON jobs(queue)');
 
-        $pdo->exec('CREATE TABLE IF NOT EXISTS job_batches (
+        Schema::statement('CREATE TABLE IF NOT EXISTS job_batches (
             id VARCHAR(255) PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            total_jobs INTEGER NOT NULL,
-            pending_jobs INTEGER NOT NULL,
-            failed_jobs INTEGER NOT NULL,
-            failed_job_ids TEXT NOT NULL,
+            name VARCHAR(255),
+            total_jobs INTEGER,
+            pending_jobs INTEGER,
+            failed_jobs INTEGER,
+            failed_job_ids TEXT,
             options TEXT,
             cancelled_at INTEGER,
-            created_at INTEGER NOT NULL,
+            created_at INTEGER,
             finished_at INTEGER
         )');
 
-        $pdo->exec('CREATE TABLE IF NOT EXISTS failed_jobs (
+        Schema::statement('CREATE TABLE IF NOT EXISTS failed_jobs (
             id BIGSERIAL PRIMARY KEY,
-            uuid VARCHAR(255) NOT NULL UNIQUE,
-            connection TEXT NOT NULL,
-            queue TEXT NOT NULL,
-            payload TEXT NOT NULL,
-            exception TEXT NOT NULL,
-            failed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            uuid VARCHAR(255) UNIQUE,
+            connection TEXT,
+            queue TEXT,
+            payload TEXT,
+            exception TEXT,
+            failed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )');
     }
 

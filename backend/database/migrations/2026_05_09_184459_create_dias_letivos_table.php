@@ -8,13 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $pdo = Schema::getConnection()->getPdo();
-
-        $pdo->exec('CREATE TABLE IF NOT EXISTS dias_letivos (
+        Schema::statement('CREATE TABLE IF NOT EXISTS dias_letivos (
             id BIGSERIAL PRIMARY KEY,
-            ano SMALLINT NOT NULL,
-            bimestre INTEGER NOT NULL,
-            dias INTEGER NOT NULL,
+            ano SMALLINT,
+            bimestre INTEGER,
+            dias INTEGER,
             created_at TIMESTAMP,
             updated_at TIMESTAMP,
             UNIQUE(ano, bimestre)

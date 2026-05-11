@@ -8,36 +8,33 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $pdo = Schema::getConnection()->getPdo();
-
-        $pdo->exec('CREATE TABLE IF NOT EXISTS usuarios (
+        Schema::statement('CREATE TABLE IF NOT EXISTS usuarios (
             id BIGSERIAL PRIMARY KEY,
             nome VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
             senha VARCHAR(255) NOT NULL,
             funcao VARCHAR(255) NOT NULL DEFAULT \'professor\',
-            created_at TIMESTAMP NULL,
-            updated_at TIMESTAMP NULL
+            created_at TIMESTAMP,
+            updated_at TIMESTAMP
         )');
 
-        $pdo->exec('CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        Schema::statement('CREATE TABLE IF NOT EXISTS password_reset_tokens (
             email VARCHAR(255) PRIMARY KEY,
             token VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP NULL
+            created_at TIMESTAMP
         )');
 
-        $pdo->exec('CREATE TABLE IF NOT EXISTS sessions (
+        Schema::statement('CREATE TABLE IF NOT EXISTS sessions (
             id VARCHAR(255) PRIMARY KEY,
-            usuario_id BIGINT,
+            usuario_id BIGINT REFERENCES usuarios(id) ON DELETE SET NULL,
             ip_address VARCHAR(45),
             user_agent TEXT,
-            payload TEXT NOT NULL,
-            last_activity INTEGER NOT NULL,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+            payload TEXT,
+            last_activity INTEGER
         )');
 
-        $pdo->exec('CREATE INDEX IF NOT EXISTS sessions_usuario_id_index ON sessions(usuario_id)');
-        $pdo->exec('CREATE INDEX IF NOT EXISTS sessions_last_activity_index ON sessions(last_activity)');
+        Schema::statement('CREATE INDEX IF NOT EXISTS sessions_usuario_id_index ON sessions(usuario_id)');
+        Schema::statement('CREATE INDEX IF NOT EXISTS sessions_last_activity_index ON sessions(last_activity)');
     }
 
     public function down(): void

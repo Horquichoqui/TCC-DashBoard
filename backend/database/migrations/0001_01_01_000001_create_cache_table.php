@@ -8,23 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $pdo = Schema::getConnection()->getPdo();
-
-        $pdo->exec('CREATE TABLE IF NOT EXISTS cache (
+        Schema::statement('CREATE TABLE IF NOT EXISTS cache (
             key VARCHAR(255) PRIMARY KEY,
-            value TEXT NOT NULL,
-            expiration BIGINT NOT NULL
+            value TEXT,
+            expiration BIGINT
         )');
 
-        $pdo->exec('CREATE INDEX IF NOT EXISTS cache_expiration_index ON cache(expiration)');
+        Schema::statement('CREATE INDEX IF NOT EXISTS cache_expiration_index ON cache(expiration)');
 
-        $pdo->exec('CREATE TABLE IF NOT EXISTS cache_locks (
+        Schema::statement('CREATE TABLE IF NOT EXISTS cache_locks (
             key VARCHAR(255) PRIMARY KEY,
-            owner VARCHAR(255) NOT NULL,
-            expiration BIGINT NOT NULL
+            owner VARCHAR(255),
+            expiration BIGINT
         )');
 
-        $pdo->exec('CREATE INDEX IF NOT EXISTS cache_locks_expiration_index ON cache_locks(expiration)');
+        Schema::statement('CREATE INDEX IF NOT EXISTS cache_locks_expiration_index ON cache_locks(expiration)');
     }
 
     public function down(): void

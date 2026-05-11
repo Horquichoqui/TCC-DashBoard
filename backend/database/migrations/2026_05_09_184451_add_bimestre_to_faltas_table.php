@@ -8,13 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $pdo = Schema::getConnection()->getPdo();
-        $pdo->exec('ALTER TABLE faltas ADD COLUMN IF NOT EXISTS bimestre INTEGER NOT NULL DEFAULT 1');
+        Schema::statement('ALTER TABLE faltas ADD COLUMN IF NOT EXISTS bimestre INTEGER DEFAULT 1');
     }
 
     public function down(): void
     {
-        $pdo = Schema::getConnection()->getPdo();
-        $pdo->exec('ALTER TABLE faltas DROP COLUMN IF EXISTS bimestre');
+        Schema::statement('ALTER TABLE faltas DROP COLUMN IF EXISTS bimestre');
     }
 };

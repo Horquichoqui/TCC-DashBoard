@@ -8,11 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $pdo = Schema::getConnection()->getPdo();
-
-        $pdo->exec('CREATE TABLE IF NOT EXISTS disciplinas (
+        Schema::statement('CREATE TABLE IF NOT EXISTS disciplinas (
             id BIGSERIAL PRIMARY KEY,
-            nome VARCHAR(255) NOT NULL,
+            nome VARCHAR(255),
             descricao TEXT,
             created_at TIMESTAMP,
             updated_at TIMESTAMP

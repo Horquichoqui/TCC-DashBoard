@@ -8,22 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $pdo = Schema::getConnection()->getPdo();
-
-        $pdo->exec('CREATE TABLE IF NOT EXISTS alunos (
+        Schema::statement('CREATE TABLE IF NOT EXISTS alunos (
             id BIGSERIAL PRIMARY KEY,
-            nome VARCHAR(255) NOT NULL,
-            matricula VARCHAR(255) NOT NULL UNIQUE,
+            nome VARCHAR(255),
+            matricula VARCHAR(255) UNIQUE,
             email VARCHAR(255),
             telefone VARCHAR(255),
-            turma VARCHAR(255) NOT NULL,
-            usuario_id BIGINT,
+            turma VARCHAR(255),
+            usuario_id BIGINT REFERENCES usuarios(id) ON DELETE SET NULL,
             created_at TIMESTAMP,
-            updated_at TIMESTAMP,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+            updated_at TIMESTAMP
         )');
 
-        $pdo->exec('CREATE INDEX IF NOT EXISTS alunos_usuario_id_index ON alunos(usuario_id)');
+        Schema::statement('CREATE INDEX IF NOT EXISTS alunos_usuario_id_index ON alunos(usuario_id)');
     }
 
     public function down(): void
