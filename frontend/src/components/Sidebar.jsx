@@ -14,6 +14,7 @@ const itensMenu = [
   { para: "/alunos-risco",      rotulo: "Alunos em Risco",    icone: "⚠️" },
   { para: "/turmas",            rotulo: "Turmas",             icone: "🏫" },
   { para: "/integracao-sponte", rotulo: "Integração Sponte",  icone: "🔗" },
+  { para: "/perfil",            rotulo: "Meu Perfil",         icone: "👤" },
 ];
 
 export default function Sidebar() {
