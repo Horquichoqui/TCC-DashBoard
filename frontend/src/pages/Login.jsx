@@ -29,32 +29,46 @@ export default function Login() {
       <div className="bg-zinc-800 rounded-2xl shadow-xl w-full max-w-md p-8 border border-zinc-700">
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">📊</div>
-          <h1 className="text-2xl font-bold text-yellow-400">Dashboard Pedagógico</h1>
-          <p className="text-zinc-400 text-sm mt-1">Escola Cooperativa Coopen</p>
+          <h1 className="text-2xl font-bold text-yellow-400">
+            Dashboard Pedagógico
+          </h1>
+          <p className="text-zinc-400 text-sm mt-1">
+            Escola Cooperativa Coopen
+          </p>
         </div>
         <form onSubmit={aoEnviar} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-1">E-mail</label>
+            <label className="block text-sm font-medium text-zinc-300 mb-1">
+              E-mail
+            </label>
             <input
               type="email"
               value={formulario.email}
-              onChange={(e) => setFormulario({ ...formulario, email: e.target.value })}
+              onChange={(e) =>
+                setFormulario({ ...formulario, email: e.target.value })
+              }
               className="w-full border border-zinc-600 bg-zinc-700 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder-zinc-500"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-1">Senha</label>
+            <label className="block text-sm font-medium text-zinc-300 mb-1">
+              Senha
+            </label>
             <input
               type="password"
               value={formulario.senha}
-              onChange={(e) => setFormulario({ ...formulario, senha: e.target.value })}
+              onChange={(e) =>
+                setFormulario({ ...formulario, senha: e.target.value })
+              }
               className="w-full border border-zinc-600 bg-zinc-700 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
             />
           </div>
           {mensagemErro && (
-            <p className="text-red-400 text-sm bg-red-900/30 p-3 rounded-lg">{mensagemErro}</p>
+            <p className="text-red-400 text-sm bg-red-900/30 p-3 rounded-lg">
+              {mensagemErro}
+            </p>
           )}
           <button
             type="submit"
@@ -65,7 +79,7 @@ export default function Login() {
           </button>
         </form>
         <p className="text-center text-xs text-zinc-500 mt-6">
-          TCC/Projeto Integrador — UNIVESP 2025
+          TCC/Projeto Integrador - UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO
         </p>
       </div>
     </div>

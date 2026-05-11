@@ -1,3 +1,6 @@
+// Configuração do Tailwind CSS - framework de estilos usado nas telas
+// O campo "content" seleciona quais arquivos o Tailwind deve escanear para gerar os estilos
+/** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   darkMode: "class",
