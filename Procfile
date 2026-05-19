@@ -1,0 +1,1 @@
+web: composer install --prefer-dist --no-dev && npm install --prefix frontend && npm run build --prefix frontend && cp -r frontend/dist/* backend/public/ && php artisan config:cache && php artisan route:cache && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
