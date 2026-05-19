@@ -1,1 +1,1 @@
-web: composer install --prefer-dist --no-dev -d backend && npm install --prefix frontend && npm run build --prefix frontend && cp -r frontend/dist/* backend/public/ && php backend/artisan config:cache && php backend/artisan route:cache && php backend/artisan migrate --force && php -S 0.0.0.0:10000 -t backend/public backend/server.php
+web: npm install && npm run build && node server.js
