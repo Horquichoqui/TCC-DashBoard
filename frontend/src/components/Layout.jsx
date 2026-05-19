@@ -41,6 +41,9 @@ export default function Layout({ children }) {
           <Link to="/relatorios"   className={`menu-item ${isActive('/relatorios')}`}>
             📊 Relatórios
           </Link>
+          <Link to="/integracao-sponte" className={`menu-item ${isActive('/integracao-sponte')}`}>
+            🔌 Integração Sponte
+          </Link>
 
           <div className="menu-divisor"></div>
 

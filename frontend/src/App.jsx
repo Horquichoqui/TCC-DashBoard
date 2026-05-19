@@ -9,6 +9,7 @@ import FaltasPage from './pages/FaltasPage';
 import AlunosEmRiscoPage from './pages/AlunosEmRiscoPage';
 import RelatoriosPage from './pages/RelatoriosPage';
 import AjudaPage from './pages/AjudaPage';
+import IntegracaoSponte from './pages/IntegracaoSponte';
 import './App.css';
 
 // Conteúdo principal: define todas as rotas do sistema
@@ -29,6 +30,7 @@ function AppContent() {
             <Route path="/faltas"      element={<Layout><FaltasPage /></Layout>} />
             <Route path="/alunos-risco" element={<Layout><AlunosEmRiscoPage /></Layout>} />
             <Route path="/relatorios"  element={<Layout><RelatoriosPage /></Layout>} />
+            <Route path="/integracao-sponte" element={<Layout><IntegracaoSponte /></Layout>} />
             <Route path="/ajuda"       element={<Layout><AjudaPage /></Layout>} />
 
             {/* Rota raiz redireciona para o dashboard */}

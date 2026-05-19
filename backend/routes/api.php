@@ -8,6 +8,7 @@ use App\Http\Controllers\NotaController;
 use App\Http\Controllers\FaltaController;
 use App\Http\Controllers\DisciplinaController;
 use App\Http\Controllers\DiaLetivoController;
+use App\Http\Controllers\SponteController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -23,4 +24,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/faltas/presenca/{alunoId}/{bimestre}', [FaltaController::class, 'presencaAluno']);
     Route::get('/relatorio/alunos-em-risco', [FaltaController::class, 'alunosEmRisco']);
+
+    // Rotas de integração Sponte
+    Route::prefix('sponte')->group(function () {
+        Route::get('/status', [SponteController::class, 'getStatus']);
+        Route::post('/configuracao', [SponteController::class, 'saveConfig']);
+        Route::post('/testar-conexao', [SponteController::class, 'testConnection']);
+        Route::post('/sincronizar/turmas', [SponteController::class, 'syncTurmas']);
+        Route::post('/sincronizar/alunos', [SponteController::class, 'syncAlunos']);
+        Route::post('/sincronizar/boletins', [SponteController::class, 'syncBoletins']);
+        Route::post('/sincronizar/completa', [SponteController::class, 'syncCompleta']);
+        Route::get('/logs', [SponteController::class, 'getLogs']);
+    });
 });
+
