@@ -8,3 +8,4 @@ build
 npm-debug.log
 frontend/dist
 .claude/
+backend/.env.production
