@@ -1,232 +1,287 @@
-# Dashboard de Monitoramento de Alunos - TCC
+# Dashboard Pedagógico Coopen
 
-Sistema simples para monitoramento de alunos com controle de notas e frequência.
+Sistema de Dashboard Pedagógico para Monitoramento de Desempenho Escolar.
+TCC/Projeto Integrador — UNIVESP.
 
-## Stack Tecnológico
+---
 
-- **Frontend**: React.js + Vite
-- **Backend**: Laravel 11 + PHP
-- **Banco de Dados**: PostgreSQL (NEON) ou SQLite (desenvolvimento local)
-- **Autenticação**: Laravel Sanctum (JWT Tokens)
-- **Gráficos**: Recharts
+## Objetivo
 
-## Estrutura do Projeto
+Ajudar a coordenação pedagógica da Escola Cooperativa Coopen a visualizar rapidamente alunos com baixo desempenho, risco de reprovação ou risco de evasão, por meio de dashboards, gráficos e filtros.
 
-```
-TCC-DashBoard/
-├── frontend/                 # Aplicação React
-│   ├── src/
-│   │   ├── pages/            # Páginas da aplicação
-│   │   ├── components/       # Componentes reutilizáveis
-│   │   ├── context/          # Context API (autenticação)
-│   │   ├── services/         # Serviços de API
-│   │   └── styles/           # Arquivos CSS
-│   ├── package.json
-│   └── vite.config.js
-│
-└── backend/                  # API Laravel
-    ├── app/
-    │   ├── Models/           # Modelos do banco
-    │   ├── Http/Controllers/ # Controllers REST
-    │   └── Middleware/       # Middleware de autenticação
-    ├── database/
-    │   ├── migrations/       # Migrations do banco
-    │   └── seeders/          # Dados iniciais
-    ├── routes/
-    │   └── api.php           # Rotas da API
-    └── .env                  # Variáveis de ambiente
-```
+---
 
-## Funcionalidades Implementadas
+## Tecnologias
 
-### Fase 1 - Setup & Autenticação ✅
-- ✅ Estrutura React com Vite
-- ✅ Projeto Laravel com migrations
-- ✅ Autenticação com JWT (Sanctum)
-- ✅ Layout com menu lateral
-- ✅ Models e relacionamentos das tabelas
+| Camada | Tecnologia |
+|--------|-----------|
+| Frontend | React + Vite + Tailwind CSS + Recharts |
+| Roteamento | React Router DOM |
+| HTTP | Axios |
+| Backend | Node.js + Express |
+| Banco | PostgreSQL no Neon |
+| Autenticação | JWT + bcryptjs |
+| Deploy | Render (uma única instância) |
 
-### Fase 2 - API & Listagem ✅
-- ✅ API RESTful para CRUD de alunos
-- ✅ Página de login
-- ✅ Listagem de alunos com filtros
-- ✅ Dashboard com gráficos
-- ✅ Dados de teste com seeders
+---
 
-### Fase 3 - Notas & Frequência ✅
-- ✅ API para lançar notas
-- ✅ API para registrar frequência
-- ✅ Models de Nota e Falta
+## Como rodar localmente
 
-### Próximas Fases
-- ⏳ Página de detalhes do aluno
-- ⏳ Formulários para lançar notas e frequência
-- ⏳ Relatórios avançados
-- ⏳ Exportação de dados (CSV/PDF)
-- ⏳ Deploy em Render + NEON
+### Pré-requisitos
 
-## Instalação & Setup
+- Node.js 18+
+- Conta no [Neon](https://neon.tech) com banco PostgreSQL criado
 
-### Backend (Laravel)
+### 1. Clonar o repositório
 
 ```bash
-cd backend
-
-# Instalar dependências
-composer install
-
-# Configurar variáveis de ambiente
-cp .env.example .env
-php artisan key:generate
-
-# Rodar migrations
-php artisan migrate
-
-# Popular banco com dados de teste
-php artisan db:seed
-
-# Iniciar servidor
-php artisan serve
+git clone <url-do-repositorio>
+cd projeto-dashboard-coopen
 ```
 
-O servidor Laravel será executado em `http://localhost:8000`
-
-### Frontend (React)
+### 2. Configurar variáveis de ambiente
 
 ```bash
-cd frontend
+cp backend/.env.example backend/.env
+```
 
-# Instalar dependências
-npm install
+Abra `backend/.env` e preencha:
 
-# Iniciar servidor de desenvolvimento
+```
+DATABASE_URL="postgresql://usuario:senha@host/neondb?sslmode=require&channel_binding=require"
+JWT_SECRET="uma_chave"
+PORT=3000
+NODE_ENV=development
+USE_MOCK_DATA=false
+FRONTEND_URL=http://localhost:5173
+```
+
+### 3. Instalar dependências
+
+```bash
+npm run install:all
+```
+
+### 4. Criar as tabelas no banco
+
+```bash
+npm run db:init
+```
+
+### 5. Inserir dados de demonstração
+
+```bash
+npm run db:seed
+```
+
+### 6. Rodar em desenvolvimento
+
+```bash
 npm run dev
 ```
 
-O servidor React será executado em `http://localhost:5173`
+- Frontend: http://localhost:5173
+- Backend: http://localhost:3000
+- Health check: http://localhost:3000/api/health
 
-## Credenciais de Teste
+---
 
-### Admin
-- Email: `admin@dashboard.com`
-- Senha: `password123`
+## Banco de dados Neon
 
-### Professor
-- Email: `joao@dashboard.com`
-- Senha: `password123`
+O sistema usa PostgreSQL hospedado no [Neon](https://neon.tech).
 
-## Banco de Dados
+### Tabelas (nomes em português brasileiro)
 
-### Tabelas Principais
+| Tabela | Descrição |
+|--------|-----------|
+| `usuarios` | Usuários do sistema (coordenação para conferência) |
+| `turmas` | Turmas e anos letivos |
+| `alunos` | Alunos matriculados |
+| `disciplinas` | Disciplinas |
+| `periodos_letivos` | Bimestres/semestres |
+| `notas` | Notas por aluno, disciplina e período |
+| `frequencias` | Frequência por aluno e disciplina |
+| `integracoes_sponte` | Registro de integração com Sponte |
 
-1. **usuarios** - Usuários (admin/professor)
-   - id, nome, email, senha, funcao
+### Criar as tabelas
 
-2. **alunos** - Informações dos alunos
-   - id, nome, matricula, email, telefone, turma
+```bash
+npm run db:init
+```
 
-3. **disciplinas** - Disciplinas ofertadas
-   - id, nome, descricao
+### Inserir dados de demonstração
 
-4. **notas** - Registros de notas
-   - id, aluno_id, disciplina_id, valor_nota, semestre
+```bash
+npm run db:seed
+```
 
-5. **faltas** - Registros de frequência
-   - id, aluno_id, data, presente
+### Testar conexão
 
-6. **professor_alunos** - Relacionamento professor-aluno
-   - id, professor_id, aluno_id
+Acesse: `http://localhost:3000/api/health`
 
-## Rotas da API
+Resposta esperada:
+```json
+{ "status": "ok", "database": "connected", "message": "Backend conectado ao Neon" }
+```
 
-### Autenticação
-- `POST /api/login` - Fazer login
-- `POST /api/logout` - Fazer logout
-- `GET /api/me` - Dados do usuário autenticado
+---
 
-### Alunos
-- `GET /api/alunos` - Listar alunos
-- `POST /api/alunos` - Criar aluno
-- `GET /api/alunos/{id}` - Detalhes do aluno
-- `PUT /api/alunos/{id}` - Atualizar aluno
-- `DELETE /api/alunos/{id}` - Deletar aluno
+## Login inicial
 
-### Notas
-- `GET /api/notas` - Listar notas
-- `POST /api/notas` - Lançar nota
-- `PUT /api/notas/{id}` - Atualizar nota
-- `DELETE /api/notas/{id}` - Deletar nota
+```
+E-mail: coordenacao@coopen.com
+Senha:  123456
+```
 
-### Frequência
-- `GET /api/faltas` - Listar faltas
-- `POST /api/faltas` - Registrar frequência
-- `PUT /api/faltas/{id}` - Atualizar frequência
-- `DELETE /api/faltas/{id}` - Deletar frequência
+---
 
-### Disciplinas
-- `GET /api/disciplinas` - Listar disciplinas
-- `POST /api/disciplinas` - Criar disciplina
-- `PUT /api/disciplinas/{id}` - Atualizar disciplina
-- `DELETE /api/disciplinas/{id}` - Deletar disciplina
+## Deploy no Render
 
-## Perfis de Acesso
+### Uma única instância Web Service
 
-### Admin
-- Acesso total ao sistema
-- Gerenciar usuários
-- Gerenciar disciplinas
-- Visualizar todos os alunos
+1. Acesse [render.com](https://render.com) e crie um **Web Service**
+2. Conecte o repositório GitHub
+3. Configure:
 
-### Professor
-- Visualizar seus alunos
-- Lançar notas
-- Registrar frequência
-- Visualizar relatórios de seus alunos
+| Campo | Valor |
+|-------|-------|
+| Build Command | `npm run install:all && npm run build` |
+| Start Command | `npm start` |
+| Root Directory | (deixar vazio) |
 
-## Deploy
+4. Adicione as **Environment Variables**:
 
-### Backend (Render)
-Deploy URL: https://api.render.com/deploy/srv-d7vm8udb910c73d5g3i0?key=zB8slE00RrM
+```
+DATABASE_URL=<url-real-do-neon>
+JWT_SECRET=<chave-secreta-forte>
+NODE_ENV=production
+USE_MOCK_DATA=false
+```
 
-### Banco de Dados (NEON)
-Connection: `postgresql://neondb_owner:npg_pB0T8dMWFGfK@ep-plain-sea-ac72oqv6-pooler.sa-east-1.aws.neon.tech/neondb`
+5. Clique em **Deploy**
 
-## Desenvolvimento
+Após o deploy, rode o seed uma vez via shell do Render:
+```bash
+npm run db:init
+npm run db:seed
+```
 
-### Padrões de Código
-- Componentes funcionais com Hooks
-- Context API para gerenciamento de estado
-- Axios para requisições HTTP
-- CSS Modules ou CSS global
-- Models Eloquent no Laravel
-- Controllers RESTful
+O sistema estará disponível em:
+```
+https://seu-app.onrender.com/login
+https://seu-app.onrender.com/dashboard
+https://seu-app.onrender.com/alunos-risco
+https://seu-app.onrender.com/api/health
+```
 
-### Extensões Recomendadas
-- ES7+ React/Redux/React-Native snippets
-- Laravel Extension Pack
-- PostgreSQL extension
+> **Importante:** Não criar Static Site separado. O Express serve o React compilado em produção.
 
-## Próximos Passos
+---
 
-1. Página de detalhes do aluno com histórico completo
-2. Formulário para edição de alunos
-3. Lançamento de notas (admin/professor)
-4. Lançamento de frequência (admin/professor)
-5. Relatórios avançados por aluno
-6. Exportação de dados em CSV
-7. Validações adicionais no frontend
-8. Testes automatizados
-9. Deploy em Render + NEON
-10. Diagramas de arquitetura para documentação
+## Estrutura do projeto
 
-## Suporte
+```
+/
+├── package.json           # Scripts raiz (install, build, start, dev)
+├── render.yaml            # Configuração do Render
+├── .gitignore
+├── README.md
+├── backend/
+│   ├── package.json
+│   ├── .env.example
+│   └── src/
+│       ├── server.js          # Express principal
+│       ├── db.js              # Conexão com Neon
+│       ├── config/            # Regras de risco pedagógico
+│       ├── controllers/       # Lógica das rotas
+│       ├── repositories/      # Queries SQL
+│       ├── routes/            # Definição das rotas /api
+│       ├── middlewares/       # JWT, erros
+│       ├── services/          # Integração Sponte (futura)
+│       ├── utils/             # Calculadora de risco, CSV
+│       └── database/          # schema.sql, init, seed
+└── frontend/
+    ├── package.json
+    ├── vite.config.js
+    └── src/
+        ├── App.jsx
+        ├── pages/             # Login, Dashboard, AlunosRisco, Turmas, ...
+        ├── components/        # Sidebar, Header, StatCard, RiskBadge, ...
+        ├── services/api.js    # Axios configurado
+        └── utils/formatters.js
+```
 
-Para dúvidas ou problemas, verifique:
-1. Se o servidor Laravel está rodando em `localhost:8000`
-2. Se o banco de dados está acessível
-3. Os logs do servidor: `php artisan tinker` ou `tail -f storage/logs/laravel.log`
-4. O console do navegador para erros de frontend
+---
 
-## Licença
+## Como funciona a arquitetura
 
-Projeto desenvolvido como TCC - Dashboard de Monitoramento de Alunos
+```
+Usuário
+  ↓
+Render (único Web Service)
+  ↓
+Express (Node.js)
+  ├── /api/*  → controllers → repositories → PostgreSQL Neon
+  └── /*      → frontend/dist (React compilado)
+```
+
+Em produção, o Express serve o `frontend/dist` gerado pelo `vite build`.  
+Qualquer rota não-API é redirecionada para `index.html` (SPA).
+
+---
+
+## Como explicar o sistema na apresentação
+
+1. O usuário acessa o sistema pelo Render.
+2. O backend Express entrega o frontend React.
+3. O login gera um token JWT.
+4. As telas protegidas usam esse token em cada requisição.
+5. O backend consulta o banco Neon com queries SQL simples.
+6. Os dados são transformados em indicadores pedagógicos.
+7. O dashboard mostra gráficos (Recharts) e cards de resumo.
+8. A tela de alunos em risco aplica as regras de média (≥6) e frequência (≥75%).
+9. A coordenação pode filtrar dados e exportar CSV.
+10. O sistema está preparado para futura integração com a API Sponte.
+
+---
+
+## Roteiro rápido para demonstração
+
+1. Abrir o sistema publicado no Render
+2. Fazer login (`coordenacao@coopen.com` / `123456`)
+3. Mostrar o **Dashboard** — cards de indicadores e 4 gráficos
+4. Explicar os cards: total de alunos, alunos em risco, média geral, frequência
+5. Mostrar os gráficos: risco por turma, evolução de média, distribuição, frequência
+6. Abrir **Alunos em Risco** — tabela com situação colorida
+7. Aplicar filtros por turma e situação
+8. Exportar **CSV**
+9. Abrir o detalhe de um aluno em risco
+10. Mostrar a página **Integração Sponte**
+11. Explicar que os dados vêm do Neon e o sistema está preparado para integração futura com API Sponte
+
+---
+
+## Checklist final
+
+- [ ] `npm run db:init` executado com sucesso
+- [ ] `npm run db:seed` executado com sucesso
+- [ ] `/api/health` retorna `"database": "connected"`
+- [ ] Login funciona com `coordenacao@coopen.com` / `123456`
+- [ ] Dashboard carrega cards e gráficos
+- [ ] Alunos em risco aparecem na listagem
+- [ ] Filtros funcionam
+- [ ] Exportação CSV funciona
+- [ ] Detalhe do aluno carrega notas e frequências
+- [ ] Página de integração Sponte carrega
+- [ ] `.env` não está versionado
+- [ ] `DATABASE_URL` real não aparece no código
+- [ ] Recarregar `/dashboard` não gera 404 em produção
+
+---
+
+---
+
+## Aviso sobre rotas de banco
+
+As rotas `/api/database/*` são para inspeção em desenvolvimento.  
+**Remover ou proteger com autenticação antes de tornar o sistema público.**

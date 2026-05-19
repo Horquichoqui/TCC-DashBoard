@@ -1,15 +1,18 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+// Configuração do Vite — ferramenta que compila e serve o frontend React
+// Em desenvolvimento, o proxy redireciona /api para o backend na porta 3000
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
   server: {
+    port: 5173, // Porta do frontend em desenvolvimento local
     proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
+      // Redireciona chamadas /api para o backend Express durante o desenvolvimento
+      "/api": {
+        target: "http://localhost:3000",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api'),
       },
     },
   },
-})
+});

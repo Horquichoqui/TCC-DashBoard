@@ -1,62 +1,16 @@
-# Render Deploy Configuration
-# Dois serviços: backend PHP/Laravel + frontend React (Static Site)
-
 services:
-  # ─── Backend: API Laravel/PHP ────────────────────────────────────────────────
   - type: web
-    name: tcc-dashboard-backend
-    runtime: php
-    region: ohio
+    name: dashboard-pedagogico-coopen
+    env: node
     plan: free
-    rootDir: backend
-
-    buildCommand: >
-      composer install --no-dev --optimize-autoloader &&
-      php artisan key:generate --force &&
-      php artisan migrate --force --seed
-
-    startCommand: vendor/bin/heroku-php-apache2 public/
-
-    env:
-      - key: APP_NAME
-        value: Dashboard
-      - key: APP_ENV
+    buildCommand: npm run install:all && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
         value: production
-      - key: APP_KEY
-        value: base64:BWskfY9YT036Qrio94ikbH83MZbC7nAiAKxgbd0vZ+g=
-      - key: APP_DEBUG
-        value: "false"
-      - key: APP_URL
-        value: https://tcc-dashboard-backend.onrender.com
-      - key: DB_CONNECTION
-        value: pgsql
-      - key: DB_URL
-        value: postgresql://neondb_owner:npg_VvXhG1akp7Zd@ep-proud-heart-acvmtl8f-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-      - key: DB_SSLMODE
-        value: require
-      - key: CACHE_STORE
-        value: file
-      - key: SESSION_DRIVER
-        value: cookie
-      - key: LOG_LEVEL
-        value: info
-
-  # ─── Frontend: React SPA (Static Site) ───────────────────────────────────────
-  - type: static
-    name: tcc-dashboard-frontend
-    region: ohio
-    rootDir: frontend
-
-    buildCommand: npm install --legacy-peer-deps && npm run build
-
-    staticPublishPath: dist
-
-    # Redireciona todas as rotas para index.html (React Router)
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-
-    env:
-      - key: VITE_API_URL
-        value: https://tcc-dashboard-backend.onrender.com/api
+      - key: USE_MOCK_DATA
+        value: false
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
