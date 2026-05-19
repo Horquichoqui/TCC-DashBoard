@@ -1,98 +1,384 @@
-import React, { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar.jsx";
-import Header from "../components/Header.jsx";
-import Loading from "../components/Loading.jsx";
-import api from "../services/api.js";
+import React, { useState, useEffect } from 'react';
+import sponteApi from '../services/sponteApi';
+import SponteStatusCard from '../components/SponteStatusCard';
+import SponteSyncLogTable from '../components/SponteSyncLogTable';
+import '../styles/IntegracaoSponte.css';
 
+/**
+ * Página de Integração com o Sponte
+ *
+ * Responsável por:
+ * 1. Exibir status da integração
+ * 2. Configurar CodigoCliente e Token
+ * 3. Testar conexão com o Sponte
+ * 4. Sincronizar dados (turmas, alunos, boletins)
+ * 5. Exibir logs de sincronização
+ */
 export default function IntegracaoSponte() {
-  const [statusIntegracao, setStatusIntegracao] = useState(null);
-  const [carregando,       setCarregando]       = useState(true);
+  const [status, setStatus] = useState(null);
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [testando, setTestando] = useState(false);
+  const [sincronizando, setSincronizando] = useState(false);
+  const [mensagem, setMensagem] = useState(null);
 
+  // Formulário
+  const [codigoCliente, setCodigoCliente] = useState('');
+  const [token, setToken] = useState('');
+  const [modoMock, setModoMock] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+
+  // Carregar status e logs ao montar
   useEffect(() => {
-    api.get("/integracao-sponte/status")
-      .then((r) => setStatusIntegracao(r.data))
-      .catch(console.error)
-      .finally(() => setCarregando(false));
+    carregarDados();
   }, []);
 
+  async function carregarDados() {
+    try {
+      setLoading(true);
+      const [statusResp, logsResp] = await Promise.all([
+        sponteApi.getStatus(),
+        sponteApi.getLogs(50),
+      ]);
+
+      setStatus(statusResp.data);
+      setLogs(logsResp.data || []);
+    } catch (erro) {
+      console.error('Erro ao carregar dados:', erro);
+      setMensagem({
+        tipo: 'erro',
+        texto: 'Erro ao carregar dados do Sponte',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSalvarConfiguracao(e) {
+    e.preventDefault();
+
+    if (!codigoCliente || !token) {
+      setMensagem({
+        tipo: 'erro',
+        texto: 'CodigoCliente e Token são obrigatórios',
+      });
+      return;
+    }
+
+    try {
+      setSalvando(true);
+      const response = await sponteApi.saveConfig(codigoCliente, token, modoMock);
+
+      if (response.success) {
+        setMensagem({
+          tipo: 'sucesso',
+          texto: 'Configuração salva com sucesso!',
+        });
+
+        // Limpar formulário
+        setToken('');
+        setCodigoCliente('');
+
+        // Recarregar status
+        await carregarDados();
+      }
+    } catch (erro) {
+      console.error('Erro ao salvar configuração:', erro);
+      setMensagem({
+        tipo: 'erro',
+        texto: erro.response?.data?.error || 'Erro ao salvar configuração',
+      });
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  async function handleTestarConexao() {
+    try {
+      setTestando(true);
+      const response = await sponteApi.testConnection();
+
+      if (response.success) {
+        setMensagem({
+          tipo: 'sucesso',
+          texto: '✓ Conexão com o Sponte testada com sucesso!',
+        });
+      }
+    } catch (erro) {
+      console.error('Erro ao testar conexão:', erro);
+      setMensagem({
+        tipo: 'erro',
+        texto: erro.response?.data?.error || 'Erro ao conectar com o Sponte',
+      });
+    } finally {
+      setTestando(false);
+      await carregarDados();
+    }
+  }
+
+  async function handleSincronizarTurmas() {
+    try {
+      setSincronizando(true);
+      setMensagem({
+        tipo: 'info',
+        texto: 'Sincronizando turmas...',
+      });
+
+      const response = await sponteApi.syncTurmas();
+      if (response.success) {
+        setMensagem({
+          tipo: 'sucesso',
+          texto: `✓ Turmas sincronizadas! ${response.data.totalInserido} inseridas, ${response.data.totalAtualizado} atualizadas.`,
+        });
+      }
+    } catch (erro) {
+      console.error('Erro ao sincronizar turmas:', erro);
+      setMensagem({
+        tipo: 'erro',
+        texto: 'Erro ao sincronizar turmas',
+      });
+    } finally {
+      setSincronizando(false);
+      await carregarDados();
+    }
+  }
+
+  async function handleSincronizarAlunos() {
+    try {
+      setSincronizando(true);
+      setMensagem({
+        tipo: 'info',
+        texto: 'Sincronizando alunos...',
+      });
+
+      const response = await sponteApi.syncAlunos();
+      if (response.success) {
+        setMensagem({
+          tipo: 'sucesso',
+          texto: `✓ Alunos sincronizados! ${response.data.totalInserido} inseridos, ${response.data.totalAtualizado} atualizados.`,
+        });
+      }
+    } catch (erro) {
+      console.error('Erro ao sincronizar alunos:', erro);
+      setMensagem({
+        tipo: 'erro',
+        texto: 'Erro ao sincronizar alunos',
+      });
+    } finally {
+      setSincronizando(false);
+      await carregarDados();
+    }
+  }
+
+  async function handleSincronizarBoletins() {
+    try {
+      setSincronizando(true);
+      setMensagem({
+        tipo: 'info',
+        texto: 'Sincronizando notas e frequências...',
+      });
+
+      const response = await sponteApi.syncBoletins();
+      if (response.success) {
+        setMensagem({
+          tipo: 'sucesso',
+          texto: `✓ Boletins sincronizados! ${response.data.totalInserido} inseridos, ${response.data.totalAtualizado} atualizados.`,
+        });
+      }
+    } catch (erro) {
+      console.error('Erro ao sincronizar boletins:', erro);
+      setMensagem({
+        tipo: 'erro',
+        texto: 'Erro ao sincronizar boletins',
+      });
+    } finally {
+      setSincronizando(false);
+      await carregarDados();
+    }
+  }
+
+  async function handleSincronizarCompleta() {
+    try {
+      setSincronizando(true);
+      setMensagem({
+        tipo: 'info',
+        texto: 'Sincronizando tudo (turmas, alunos, boletins)...',
+      });
+
+      const response = await sponteApi.syncCompleta();
+      if (response.success) {
+        setMensagem({
+          tipo: 'sucesso',
+          texto: '✓ Sincronização completa realizada com sucesso!',
+        });
+      }
+    } catch (erro) {
+      console.error('Erro na sincronização completa:', erro);
+      setMensagem({
+        tipo: 'erro',
+        texto: 'Erro na sincronização',
+      });
+    } finally {
+      setSincronizando(false);
+      await carregarDados();
+    }
+  }
+
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-zinc-900">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Header titulo="Integração Sponte" />
-        <main className="flex-1 p-6 space-y-6">
-
-          {carregando ? <Loading /> : (
-            <>
-              <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Status da Integração</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 rounded-lg p-4">
-                    <p className="text-xs text-green-600 dark:text-green-400 font-medium mb-1">Origem dos Dados</p>
-                    <p className="font-bold text-green-800 dark:text-green-300">{statusIntegracao?.origem || "Neon/PostgreSQL"}</p>
-                  </div>
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-800 rounded-lg p-4">
-                    <p className="text-xs text-yellow-600 dark:text-yellow-400 font-medium mb-1">Integração Futura</p>
-                    <p className="font-bold text-yellow-800 dark:text-yellow-300">{statusIntegracao?.integracao_futura || "API Sponte"}</p>
-                  </div>
-                  <div className="bg-gray-50 dark:bg-zinc-700 border border-gray-200 dark:border-zinc-600 rounded-lg p-4">
-                    <p className="text-xs text-gray-500 dark:text-zinc-400 font-medium mb-1">Status</p>
-                    <p className="font-bold text-gray-700 dark:text-white">{statusIntegracao?.registro?.status || "Pendente"}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Sobre o Sponte</h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                  O <strong>Sponte</strong> é o sistema de gestão acadêmica utilizado pela Escola
-                  Cooperativa Coopen. Neste dashboard, os dados pedagógicos estão carregados
-                  diretamente no banco <strong>PostgreSQL (Neon)</strong>, permitindo demonstração
-                  e análise dos indicadores educacionais.
-                </p>
-                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mt-3">
-                  A integração com a API do Sponte está prevista para uma versão futura do sistema,
-                  quando os dados serão sincronizados automaticamente — eliminando a necessidade
-                  de importação manual de planilhas.
-                </p>
-                <div className="mt-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-sm text-yellow-800 dark:text-yellow-300">
-                  <strong>📌 Nota para o TCC:</strong> O sistema já possui a estrutura preparada
-                  para receber a integração futura com a API Sponte, seguindo a arquitetura
-                  definida neste projeto.
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Sincronização</h3>
-                <p className="text-gray-500 dark:text-zinc-400 text-sm mb-4">
-                  A sincronização automática com o Sponte estará disponível quando a integração
-                  for implementada.
-                </p>
-                <button
-                  disabled
-                  className="bg-gray-100 dark:bg-zinc-700 text-gray-400 dark:text-zinc-500 cursor-not-allowed px-6 py-2.5 rounded-lg text-sm font-medium border border-gray-200 dark:border-zinc-600"
-                >
-                  🔄 Sincronizar com Sponte (em breve)
-                </button>
-              </div>
-
-              {statusIntegracao?.registro && (
-                <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700 p-6">
-                  <h3 className="text-base font-semibold text-gray-700 dark:text-zinc-300 mb-2">Último Registro</h3>
-                  <p className="text-sm text-gray-500 dark:text-zinc-400">{statusIntegracao.registro.mensagem}</p>
-                  {statusIntegracao.registro.criado_em && (
-                    <p className="text-xs text-gray-400 dark:text-zinc-500 mt-1">
-                      Registrado em:{" "}
-                      {new Date(statusIntegracao.registro.criado_em).toLocaleString("pt-BR")}
-                    </p>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-
-        </main>
+    <div className="integracao-sponte-page">
+      <div className="header-integracao">
+        <h1>🔌 Integração com Sponte Educacional</h1>
+        <p>
+          O Sponte é o sistema de gestão acadêmica que alimenta o dashboard pedagógico.
+          Configure as credenciais abaixo para sincronizar alunos, turmas, notas e frequências.
+        </p>
       </div>
+
+      {/* Mensagem de Status */}
+      {mensagem && (
+        <div className={`mensagem mensagem-${mensagem.tipo}`}>
+          {mensagem.texto}
+          <button
+            className="fechar-mensagem"
+            onClick={() => setMensagem(null)}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Card de Status */}
+      <SponteStatusCard status={status} loading={loading} />
+
+      {/* Seção de Configuração */}
+      <section className="secao-configuracao">
+        <h2>⚙️ Configuração de Credenciais</h2>
+
+        <form onSubmit={handleSalvarConfiguracao} className="forma-configuracao">
+          <div className="form-group">
+            <label htmlFor="codigo">CodigoCliente Sponte</label>
+            <input
+              id="codigo"
+              type="text"
+              value={codigoCliente}
+              onChange={(e) => setCodigoCliente(e.target.value)}
+              placeholder="Exemplo: COOPEN123"
+              disabled={salvando}
+            />
+            <small>ID fornecido pelo Sponte para sua instituição</small>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="token">Token Sponte</label>
+            <input
+              id="token"
+              type="password"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="Cole seu token aqui"
+              disabled={salvando}
+            />
+            <small>Token será criptografado antes de salvar</small>
+          </div>
+
+          <div className="form-group checkbox">
+            <label>
+              <input
+                type="checkbox"
+                checked={modoMock}
+                onChange={(e) => setModoMock(e.target.checked)}
+                disabled={salvando}
+              />
+              Usar modo demonstração (dados fictícios)
+            </label>
+            <small>
+              Desmarque para conectar diretamente ao Sponte com as credenciais acima
+            </small>
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={salvando || !codigoCliente || !token}
+            >
+              {salvando ? '⏳ Salvando...' : '💾 Salvar Configuração'}
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleTestarConexao}
+              disabled={testando || !status?.tokenConfigurado}
+            >
+              {testando ? '⏳ Testando...' : '🧪 Testar Conexão'}
+            </button>
+          </div>
+        </form>
+
+        {!status?.tokenConfigurado && (
+          <div className="alerta alerta-info">
+            <span>ℹ️</span>
+            <div>
+              <strong>Modo Demonstração Ativo</strong>
+              <p>
+                Enquanto as credenciais reais não forem informadas, o sistema usa dados fictícios
+                para demonstração do TCC. Configure o CodigoCliente e Token acima para sincronizar
+                com o Sponte real.
+              </p>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Seção de Sincronização */}
+      <section className="secao-sincronizacao">
+        <h2>📊 Sincronização de Dados</h2>
+
+        <div className="botoes-sync">
+          <button
+            className="btn btn-sync"
+            onClick={handleSincronizarTurmas}
+            disabled={sincronizando}
+          >
+            📚 Sincronizar Turmas
+          </button>
+
+          <button
+            className="btn btn-sync"
+            onClick={handleSincronizarAlunos}
+            disabled={sincronizando}
+          >
+            👥 Sincronizar Alunos
+          </button>
+
+          <button
+            className="btn btn-sync"
+            onClick={handleSincronizarBoletins}
+            disabled={sincronizando}
+          >
+            📋 Sincronizar Boletins
+          </button>
+
+          <button
+            className="btn btn-sync btn-completa"
+            onClick={handleSincronizarCompleta}
+            disabled={sincronizando}
+          >
+            {sincronizando ? '⏳ Sincronizando...' : '🔄 Sincronização Completa'}
+          </button>
+        </div>
+
+        <p className="info-sincronizacao">
+          A sincronização completa importa turmas, alunos, notas e frequências do Sponte
+          para o banco de dados local, atualizando o dashboard pedagógico.
+        </p>
+      </section>
+
+      {/* Tabela de Logs */}
+      <section className="secao-logs">
+        <SponteSyncLogTable logs={logs} loading={loading} />
+      </section>
     </div>
   );
 }
