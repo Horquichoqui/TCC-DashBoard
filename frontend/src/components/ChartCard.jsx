@@ -1,3 +1,10 @@
+// ============================================================
+// CARD DE GRÁFICO — ChartCard.jsx
+// ============================================================
+// Embrulha um gráfico Recharts com título e bordas padronizadas.
+// Todos os gráficos do dashboard usam este componente.
+// ============================================================
+
 import React from "react";
 
 export default function ChartCard({ titulo, children, altura = "h-64" }) {

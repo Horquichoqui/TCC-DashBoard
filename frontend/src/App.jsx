@@ -1,55 +1,47 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Layout from './components/Layout';
-import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
-import AlunosPage from './pages/AlunosPage';
-import FaltasPage from './pages/FaltasPage';
-import AlunosEmRiscoPage from './pages/AlunosEmRiscoPage';
-import RelatoriosPage from './pages/RelatoriosPage';
-import AjudaPage from './pages/AjudaPage';
-import IntegracaoSponte from './pages/IntegracaoSponte';
-import './App.css';
+// ============================================================
+// COMPONENTE RAIZ — App.jsx
+// ============================================================
+// Define todas as rotas do sistema usando React Router DOM.
+// Rotas protegidas só são acessadas por usuários com token JWT.
+// ============================================================
 
-// Conteúdo principal: define todas as rotas do sistema
-function AppContent() {
-  const { isAuthenticated } = useAuth();
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import AlunosRisco from "./pages/AlunosRisco.jsx";
+import Turmas from "./pages/Turmas.jsx";
+import DetalheAluno from "./pages/DetalheAluno.jsx";
+import IntegracaoSponte from "./pages/IntegracaoSponte.jsx";
+import Perfil from "./pages/Perfil.jsx";
+import Configuracoes from "./pages/Configuracoes.jsx";
 
-  return (
-    <Router>
-      <Routes>
-        {/* Se não estiver logado, só mostra a tela de login */}
-        {!isAuthenticated ? (
-          <Route path="/login" element={<LoginPage />} />
-        ) : (
-          <>
-            {/* Rotas disponíveis após o login */}
-            <Route path="/dashboard"   element={<Layout><DashboardPage /></Layout>} />
-            <Route path="/alunos"      element={<Layout><AlunosPage /></Layout>} />
-            <Route path="/faltas"      element={<Layout><FaltasPage /></Layout>} />
-            <Route path="/alunos-risco" element={<Layout><AlunosEmRiscoPage /></Layout>} />
-            <Route path="/relatorios"  element={<Layout><RelatoriosPage /></Layout>} />
-            <Route path="/integracao-sponte" element={<Layout><IntegracaoSponte /></Layout>} />
-            <Route path="/ajuda"       element={<Layout><AjudaPage /></Layout>} />
-
-            {/* Rota raiz redireciona para o dashboard */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          </>
-        )}
-
-        {/* Qualquer rota desconhecida redireciona para o lugar certo */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
-      </Routes>
-    </Router>
-  );
+// Componente que protege rotas privadas:
+// se o usuário não estiver logado, redireciona para /login
+function RotaProtegida({ children }) {
+  const token = localStorage.getItem("token");
+  if (!token) return <Navigate to="/login" replace />;
+  return children;
 }
 
-// Componente raiz: envolve tudo com o contexto de autenticação
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <BrowserRouter>
+      <Routes>
+        {/* Rota pública: tela de login */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Rotas privadas: só acessíveis após login */}
+        <Route path="/dashboard"          element={<RotaProtegida><Dashboard /></RotaProtegida>} />
+        <Route path="/alunos-risco"       element={<RotaProtegida><AlunosRisco /></RotaProtegida>} />
+        <Route path="/turmas"             element={<RotaProtegida><Turmas /></RotaProtegida>} />
+        <Route path="/alunos/:id"         element={<RotaProtegida><DetalheAluno /></RotaProtegida>} />
+        <Route path="/integracao-sponte"  element={<RotaProtegida><IntegracaoSponte /></RotaProtegida>} />
+        {/* Qualquer outra rota redireciona para o dashboard */}
+        <Route path="/perfil"             element={<RotaProtegida><Perfil /></RotaProtegida>} />
+        <Route path="/configuracoes"      element={<RotaProtegida><Configuracoes /></RotaProtegida>} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

@@ -1,3 +1,10 @@
+// ============================================================
+// DETALHE DO ALUNO - DetalheAluno.jsx
+// ============================================================
+// Exibe dados completos de um aluno (m�dia, frequ�ncia, notas e situa��o).
+// Usa o parametro :id da rota para buscar o aluno na API.
+// ============================================================
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -10,6 +17,13 @@ import StatCard from "../components/StatCard.jsx";
 import ChartCard from "../components/ChartCard.jsx";
 import Loading from "../components/Loading.jsx";
 import api from "../services/api.js";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPenToSquare,
+  faCalendarCheck,
+  faSchool,
+  faBullseye,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function DetalheAluno() {
   const { id } = useParams();
@@ -82,10 +96,10 @@ export default function DetalheAluno() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard titulo="Média Geral"  valor={Number(aluno.media_geral).toFixed(1)}        icone="📝" cor={corMedia} />
-            <StatCard titulo="Frequência"   valor={`${Number(aluno.frequencia_media).toFixed(1)}%`} icone="📅" cor={corFreq}  />
-            <StatCard titulo="Turma"        valor={aluno.turma}                                  icone="🏫" cor="blue"   />
-            <StatCard titulo="Situação"     valor={aluno.situacao}                               icone="🎯" cor={corSit}  />
+            <StatCard titulo="Média Geral"  valor={Number(aluno.media_geral).toFixed(1)}             icone={<FontAwesomeIcon icon={faPenToSquare} />}  cor={corMedia} />
+            <StatCard titulo="Frequência"   valor={`${Number(aluno.frequencia_media).toFixed(1)}%`} icone={<FontAwesomeIcon icon={faCalendarCheck} />} cor={corFreq}  />
+            <StatCard titulo="Turma"        valor={aluno.turma}                                       icone={<FontAwesomeIcon icon={faSchool} />}       cor="blue"   />
+            <StatCard titulo="Situação"     valor={aluno.situacao}                                    icone={<FontAwesomeIcon icon={faBullseye} />}     cor={corSit}  />
           </div>
 
           {notasPorDisciplina.length > 0 && (

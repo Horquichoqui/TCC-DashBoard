@@ -1,3 +1,10 @@
+// ============================================================
+// BADGE DE SITUAÇÃO — RiskBadge.jsx
+// ============================================================
+// Exibe um rótulo colorido com a situação pedagógica do aluno:
+// Verde = Regular | Amarelo = Atenção | Vermelho = Risco
+// ============================================================
+
 import React from "react";
 
 export default function RiskBadge({ situacao }) {

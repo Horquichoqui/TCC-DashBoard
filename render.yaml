@@ -1,35 +1,16 @@
 services:
   - type: web
     name: dashboard-pedagogico-coopen
-    env: php
+    env: node
     plan: free
-    buildCommand: |
-      composer install --prefer-dist --no-dev &&
-      npm install --prefix frontend &&
-      npm run build --prefix frontend &&
-      cp -r frontend/dist/* backend/public/ &&
-      php artisan config:cache &&
-      php artisan route:cache
-    startCommand: sh -c 'php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000'
-    numInstances: 1
+    buildCommand: npm run install:all && npm run build
+    startCommand: npm start
     envVars:
-      - key: APP_NAME
-        value: Dashboard
-      - key: APP_ENV
+      - key: NODE_ENV
         value: production
-      - key: APP_DEBUG
+      - key: USE_MOCK_DATA
         value: false
-      - key: APP_KEY
+      - key: DATABASE_URL
         sync: false
-      - key: APP_URL
-        value: https://tcc-dashboard-backend.onrender.com
-      - key: DB_CONNECTION
-        value: pgsql
-      - key: DB_URL
+      - key: JWT_SECRET
         sync: false
-      - key: LOG_CHANNEL
-        value: single
-      - key: SPONTE_ENCRYPTION_KEY
-        value: "dashboard-tcc-integrador-chave-segura"
-      - key: SPONTE_USE_MOCK
-        value: true
