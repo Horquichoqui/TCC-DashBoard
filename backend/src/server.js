@@ -70,18 +70,18 @@ app.use("/api/integracao-sponte",rotasIntegracao);   // Status da integração S
 // O Render sobe apenas o Node.js. O Express entrega os arquivos
 // do React compilados (pasta frontend/dist) para o navegador.
 // ============================================================
-if (process.env.NODE_ENV === "production") {
-  const pastaFrontend = path.join(__dirname, "../../frontend/dist");
+const pastaFrontend = path.join(__dirname, "../../frontend/dist");
 
-  // Serve os arquivos estáticos do React (JS, CSS, imagens)
-  app.use(express.static(pastaFrontend));
+// Serve os arquivos estáticos do React (JS, CSS, imagens)
+app.use(express.static(pastaFrontend));
 
-  // Qualquer rota que não seja /api é redirecionada para o index.html
-  // Isso evita erro 404 ao recarregar /dashboard no navegador
-  app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(pastaFrontend, "index.html"));
-  });
-}
+// Qualquer rota que não seja /api é redirecionada para o index.html
+// Isso evita erro 404 ao recarregar /dashboard no navegador (React Router SPA)
+app.get("*", (req, res) => {
+  // Se o arquivo existe, serve-o
+  // Caso contrário, serve index.html (para React Router)
+  res.sendFile(path.join(pastaFrontend, "index.html"));
+});
 
 // Middleware global de erros (captura erros não tratados nas rotas)
 app.use(tratarErro);
