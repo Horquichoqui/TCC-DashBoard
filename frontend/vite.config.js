@@ -1,5 +1,3 @@
-// Configuração do Vite — ferramenta que compila e serve o frontend React
-// Em desenvolvimento, o proxy redireciona /api para o backend na porta 3000
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
